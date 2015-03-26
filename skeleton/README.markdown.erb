@@ -53,8 +53,37 @@ This is where you list OS compatibility, version compatibility, etc.
 
 ## Development
 
-Since your module is awesome, other users will want to play with it. Let them know what the ground rules for contributing are.
+To run tests, first bundle install:
 
-## Release Notes/Contributors/Etc **Optional**
+```shell
+$ bundle install
+```
 
-If you aren't using changelog, put your release notes here (though you should consider using changelog). You may also add any additional sections you feel are necessary or important to include here. Please use the `## ` header. 
+Then, for overall spec tests, including syntax, lint, and rspec, run:
+
+```shell
+$ bundle exec rake test
+```
+
+To run acceptance tests locally, we use vagrant; first set a few environment variables for the target system:
+
+```shell
+$ export BEAKER_set=vagrant-centos6
+$ export BEAKER_destroy=no
+```
+Note: Setting `BEAKER_destroy=no` will allow you to login to the vagrant box that get's provisioned.
+
+Then execute the acceptance tests:
+
+```shell
+$ bundle exec rake acceptance
+```
+
+In order to access the vagrant box that's been provisioner, there are two options:
+Obtain the unique ID of the box using `vagrant global-status`, and then use `vagrant ssh [unique_id]`
+
+Alternately, change to the directory of the Beaker generated Vagrantfile:
+```
+$ cd .vagrant/beaker_vagrant_files/$BEAKER_SET
+```
+and run `vagrant ssh` - if there are multiple boxes, you may need to use `vagrant ssh [box_name]`
