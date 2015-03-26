@@ -6,16 +6,23 @@
 #
 # [*sample_parameter*]
 #   Explanation of what this parameter affects and what it defaults to.
-#
+
 class <%= metadata.name %> (
+<% unless metadata.name =~ /profile/ %>
   $package_name = $::<%= metadata.name %>::params::package_name,
   $service_name = $::<%= metadata.name %>::params::service_name,
+<% end %>
 ) inherits ::<%= metadata.name %>::params {
 
+<% if metadata.name =~ /profile/ %>
   # validate parameters here
 
   class { '::<%= metadata.name %>::install': } ->
   class { '::<%= metadata.name %>::config': } ~>
   class { '::<%= metadata.name %>::service': } ->
   Class['::<%= metadata.name %>']
+<% else %>
+  # Add hiera() lookups here, with validation
+<% end %>
+
 }
