@@ -1,38 +1,47 @@
 require 'spec_helper'
 
+os = ENV['BEAKER_set'] ||= 'centos6'
+
+case os
+when /default/
+  osversion = '6'
+when /centos6/
+  osversion = '6'
+when /centos7/
+  osversion = '7'
+else
+  raise "Operating system: #{os} is not supported"
+end
+
 describe '<%= metadata.name %>' do
+
+  include_context "hieradata"
+  include_context "facter"
+
   context 'supported operating systems' do
-    on_supported_os.each do |os, facts|
-      context "on #{os}" do
-        let(:facts) do
-          facts
-        end
-
-        context "<%= metadata.name %> class without any parameters" do
-          let(:params) {{ }}
-
-          it { is_expected.to compile.with_all_deps }
-
-          it { is_expected.to contain_class('<%= metadata.name %>::params') }
-          it { is_expected.to contain_class('<%= metadata.name %>::install').that_comes_before('<%= metadata.name %>::config') }
-          it { is_expected.to contain_class('<%= metadata.name %>::config') }
-          it { is_expected.to contain_class('<%= metadata.name %>::service').that_subscribes_to('<%= metadata.name %>::config') }
-
-          it { is_expected.to contain_service('<%= metadata.name %>') }
-          it { is_expected.to contain_package('<%= metadata.name %>').with_ensure('present') }
-        end
+    describe "<%= metadata.name %> class without any parameters on CentOS #{osversion}" do
+      let(:params) {{ }}
+      let(:facts) do
+        default_facts.merge({
+        :operatingsystemmajrelease => osversion,
+        })
       end
+
+      it { is_expected.to compile.with_all_deps }
+
+      it { is_expected.to contain_class('<%= metadata.name %>') }
+      it { is_expected.to contain_class('<%= metadata.name %>::params') }
+<% unless metadata.name =~ /profile/ %>
+      it { is_expected.to contain_class('<%= metadata.name %>::install').that_comes_before('<%= metadata.name %>::config') }
+      it { is_expected.to contain_class('<%= metadata.name %>::config') }
+      it { is_expected.to contain_class('<%= metadata.name %>::service').that_subscribes_to('<%= metadata.name %>::config') }
+<% end %>
+
+      ## Amend as appropriate
+      # it { is_expected.to contain_service('<%= metadata.name %>') }
+      # it { is_expected.to contain_package('<%= metadata.name %>').with_ensure('present') }
+
     end
   end
 
-  context 'unsupported operating system' do
-    describe '<%= metadata.name %> class without any parameters on Solaris/Nexenta' do
-      let(:facts) {{
-        :osfamily        => 'Solaris',
-        :operatingsystem => 'Nexenta',
-      }}
-
-      it { expect { is_expected.to contain_package('<%= metadata.name %>') }.to raise_error(Puppet::Error, /Nexenta not supported/) }
-    end
-  end
 end
