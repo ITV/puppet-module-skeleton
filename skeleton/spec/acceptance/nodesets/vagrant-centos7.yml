@@ -1,0 +1,12 @@
+HOSTS:
+  vagrant-centos7:
+    roles:
+      - master
+    platform: el-7-x86_64
+    box: puppetlabs/centos-7.0-64-nocm
+    hypervisor: vagrant
+
+CONFIG:
+  type: foss
+  log_level: debug
+  forward_ssh_agent: true

@@ -1,14 +1,13 @@
 HOSTS:
-  centos6:
+  centos7:
     roles:
       - master
-    platform: el-6-x86_64
-    image: centos:centos6
+    platform: el-7-x86_64
+    image: itv-centos7
     hypervisor: docker
     docker_cmd: '["/sbin/init"]'
     docker_image_commands:
       - 'mkdir -p /root/.ssh'
-      - 'yum install -y tar gcc ruby-devel git'
 
 CONFIG:
   type: foss
