@@ -1,0 +1,27 @@
+<%% centos_version = ENV['BEAKER_set'] ||= 'centos6' %>
+<%% if centos_version =~ /centos6/ %>
+forge "https://forge.puppetlabs.com"
+<%% else %>
+forge "https://forgeapi.puppetlabs.com"
+<%% end %>
+
+<%% repositories.each_pair do |mod,repo| %>
+mod 'itv-<%%= mod %>',
+<%% if repo.respond_to?(:to_hash) %>
+  :git => '<%%= repo['repo'] %>',
+  :ref => '<%%= repo['ref'] %>'
+
+<%% else %>
+  :git => '<%%= repo %>'
+
+<%% end %>
+<%% end unless repositories.nil? %><%%# end repo iteration %>
+
+<%% forge_modules.each_pair do |mod,name| %>
+<%% if name.respond_to?(:to_hash) %>
+mod '<%%= name['repo'] %>', '<%% name['ref'] %>'
+<%% else %>
+mod '<%%= name %>'
+
+<%% end %>
+<%% end unless forge_modules.nil? %><%%# end forge_module iteration %>
