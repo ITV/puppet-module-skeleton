@@ -23,6 +23,16 @@ PuppetLint.configuration.fail_on_warnings = true
 PuppetLint.configuration.send('disable_class_parameter_defaults')
 # http://puppet-lint.com/checks/class_inherits_from_params_class/
 PuppetLint.configuration.send('disable_class_inherits_from_params_class')
+# disable selectors in resource warnings:
+PuppetLint.configuration.send('disable_selector_inside_resource')
+
+#### WARNING: questionable checks:
+PuppetLint.configuration.send('disable_documentation')
+PuppetLint.configuration.send('disable_nested_classes_or_defines')
+PuppetLint.configuration.send('disable_autoloader_layout')
+
+# https://github.com/relud/puppet-lint-strict_indent-check#alternate-indentation
+PuppetLint.configuration.chars_per_indent = ENV['PUPPET_LINT_CHARS_PER_INDENT'] || 2
 
 exclude_paths = [
   "bundle/**/*",
