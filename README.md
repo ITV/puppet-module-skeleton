@@ -1,3 +1,7 @@
+ITV puppet module skeleton, heavily derived from Gareth Rushgrove's
+work at [https://github.com/garethr/puppet-module-skeleton] which 
+is released under an Apache software license.
+
 Puppet modules often take on the same file system structure. The
 built-in puppet-module tool makes starting modules easy, but the build
 in skeleton module is very simple. This skeleton is very opinionated.
