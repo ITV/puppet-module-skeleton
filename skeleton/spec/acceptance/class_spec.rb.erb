@@ -11,9 +11,15 @@ describe '<%= metadata.name %> class' do
       class { '<%= metadata.name %>': }
       EOS
 
+      apply_opts = {
+        :catch_failures => true,
+        :debug => ENV['BEAKER_puppet_debug'],
+      }
+
       # Run it twice and test for idempotency
-      apply_manifest(pp, :catch_failures => true)
-      apply_manifest(pp, :catch_changes  => true)
+      expect(apply_manifest(pp, apply_opts ).exit_code).to_not eq(1)
+      expect(apply_manifest(pp, apply_opts ).exit_code).to be_zero
+
     end
 
     describe package('<%= metadata.name %>') do
@@ -25,4 +31,29 @@ describe '<%= metadata.name %> class' do
       it { is_expected.to be_running }
     end
   end
+
+<% if metadata.name =~ /profile/ %>
+  context 'alternate hiera keys' do
+
+    upload_hiera_yaml('alternate_hieradata')
+
+    it 'should work with no errors' do
+
+      pp = <<-EOS
+      class { '<%= metadata.name %>': }
+      EOS
+
+      apply_opts = {
+        :catch_failures => true,
+        :debug => ENV['BEAKER_puppet_debug'],
+      }
+
+      # Run it twice and test for idempotency
+      expect(apply_manifest(pp, apply_opts ).exit_code).to_not eq(1)
+      expect(apply_manifest(pp, apply_opts ).exit_code).to be_zero
+
+    end
+
+  end
+<% end %>
 end
