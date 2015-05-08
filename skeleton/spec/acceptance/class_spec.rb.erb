@@ -35,7 +35,7 @@ describe '<%= metadata.name %> class' do
 <% if metadata.name =~ /profile/ %>
   context 'alternate hiera keys' do
 
-    upload_hiera_yaml('alternate_hieradata')
+    upload_hiera_yaml('common','common')
 
     it 'should work with no errors' do
 

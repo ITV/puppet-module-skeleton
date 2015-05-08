@@ -14,7 +14,7 @@ class <%= metadata.name %> (
 <% end %>
 ) inherits ::<%= metadata.name %>::params {
 
-<% if metadata.name =~ /profile/ %>
+<% unless metadata.name =~ /profile/ %>
   # validate parameters here
 
   class { '::<%= metadata.name %>::install': } ->
