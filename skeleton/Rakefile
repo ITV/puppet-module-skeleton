@@ -132,7 +132,7 @@ task :update_from_skeleton, :safe_update do |t,args|
     end
   end
 
-  metadata.name = repo_name.split(/puppet-module-/)[1]
+  metadata.name = repo_name.split(/puppet-module-/)[1] if repo_name =~ /^(puppet-module)/
   metadata.author = 'itv'
   metadata.license = 'Apache 2.0'
 
