@@ -161,7 +161,7 @@ def upload_puppetfile(host)
       repositories = fixtures_hash['fixtures']['repositories']
       forge_modules = fixtures_hash['fixtures']['forge_modules']
 
-      template = ERB.new( File.read( template_puppetfile ), 0, '<>' )
+      template = ERB.new( File.read( template_puppetfile ), 0, '-' )
       puppetfile = template.result(binding)
       create_remote_file( host, "/etc/puppet/Puppetfile", puppetfile )
     else
