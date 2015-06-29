@@ -48,6 +48,10 @@ RSpec::Core::RakeTask.new(:acceptance) do |t|
   t.pattern = 'spec/acceptance'
 end
 
+PuppetLint::RakeTask.new :lint do |config|
+  config.ignore_paths = PuppetLint.configuration.ignore_paths
+end
+
 desc "Populate CONTRIBUTORS file"
 task :contributors do
   system("git log --format='%aN' | sort -u > CONTRIBUTORS")
