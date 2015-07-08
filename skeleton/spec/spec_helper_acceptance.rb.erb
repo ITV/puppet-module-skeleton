@@ -191,6 +191,17 @@ def set_facts(host, facter)
 
 end
 
+def set_hieradata( hieradata_hash, calling_module='<%= metadata.name %>' )
+
+  unless hieradata_hash.nil? or hieradata_hash.empty?
+    require 'yaml'
+    hosts.each do |host|
+      create_remote_file( host, "/etc/puppet/hieradata/#{calling_module}.yaml", hieradata_hash.to_yaml)
+    end
+  end
+
+end
+
 def project_root
   proj_root = File.expand_path(File.join(File.dirname(__FILE__), '..'))
 end
