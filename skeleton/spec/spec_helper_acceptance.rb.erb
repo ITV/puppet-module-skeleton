@@ -48,6 +48,7 @@ RSpec.configure do |c|
 
       ## We manage module installation using librarian-puppet
       on host, "gem list | grep librarian-puppet || gem install librarian-puppet #{lp_version}"
+      on host, "cd /etc/puppet && rm -vf Puppetfile.lock && librarian-puppet clean --verbose" if ENV['BEAKER_LP_clean']
       on host, "cd /etc/puppet && librarian-puppet install --verbose"
 
 <% if metadata.name =~ /(-puppet)$/ %>
