@@ -1,0 +1,41 @@
+---
+### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
+### WARNING - This file should be automatically generated using ### ###
+### WARNING     the rake tasks in the root of the checkout      ### ###
+### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
+
+fixtures:
+
+<% unless all_repo_modules.nil? or all_repo_modules.empty? -%>
+  repositories:
+<% all_repo_modules.each_pair do |mod,repo| -%>
+<% module_name = mod.split('/')[1] -%>
+<% unless repo.respond_to?(:to_hash) -%>
+    <%= module_name %>: '<%= repo %>'
+<% else -%>
+    <%= module_name %>:
+      repo: '<%= repo['repo'] %>'
+      ref: '<%= repo['ref'] %>'
+<% end -%>
+<% end -%>
+<% end -%>
+
+<% unless forge_modules.nil? or forge_modules.empty? -%>
+  forge_modules:
+<% forge_modules.each_pair do |mod,repo| -%>
+<% unless repo.respond_to?(:to_hash) -%>
+    <%= mod %>: '<%= repo %>'
+<% else -%>
+    <%= mod %>:
+      repo: '<%= repo['repo'] %>'
+      ref: '<%= repo['ref'] %>'
+<% end -%>
+<% end -%>
+<% end -%>
+
+<% unless local_modules.nil? or local_modules.empty? -%>
+  symlinks:
+<% local_modules.each_pair do |mod,target| -%>
+    <%= mod %>: "<%= target %>"
+<% end -%>
+<% end -%>

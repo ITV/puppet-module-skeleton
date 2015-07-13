@@ -1,0 +1,29 @@
+---
+
+project: puppet
+repo: <%= metadata.name %>
+git_url: '<%= metadata.source %>'
+version: '<%= metadata.version %>'
+
+dependencies:
+
+  puppet_version: '3.7.4'
+  operatingsystem: CentOS
+  operatingsystemmajrelease: 7
+
+  vagrant_box: 'puppetlabs/centos-7.0-64-puppet'
+
+  puppet_modules:
+
+    profile_modules: {}
+
+    repo_modules:
+      puppetlabs/stdlib: "git://github.com/puppetlabs/puppetlabs-stdlib.git"
+
+    forge_modules:
+      concat:
+        repo: 'puppetlabs/concat'
+        ref: '1.2.3'
+
+    local_modules:
+      <%= metadata.name %>: "#{source_dir}"

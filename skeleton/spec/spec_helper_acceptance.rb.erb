@@ -148,33 +148,17 @@ def upload_puppetfile(host)
 
   require 'yaml'
 
-  static_puppetfile = File.expand_path(File.join(project_root, 'Puppetfile'))
+  puppetfile = File.expand_path(File.join(project_root, 'Puppetfile'))
   puppetfile_lock = File.expand_path(File.join(project_root, 'Puppetfile.lock'))
-  template_puppetfile = File.expand_path(File.join(project_root, 'Puppetfile.erb'))
   fixtures_file = File.expand_path(File.join( project_root, '.fixtures.yml' ))
 
-  if File.exists?( template_puppetfile )
-
-    if File.exists?( fixtures_file )
-      fixtures_hash = YAML::load(File.open( fixtures_file ))
-
-      repositories = fixtures_hash['fixtures']['repositories']
-      forge_modules = fixtures_hash['fixtures']['forge_modules']
-
-      template = ERB.new( File.read( template_puppetfile ), 0, '-' )
-      puppetfile = template.result(binding)
-      create_remote_file( host, "/etc/puppet/Puppetfile", puppetfile )
-    else
-      raise "Cannot find .fixtures.yml at #{fixtures_file}!"
-    end
-
-  elsif File.exists?( static_puppetfile )
-    scp_to host, static_puppetfile, "/etc/puppet/Puppetfile"
+  if File.exists?( puppetfile )
+    scp_to host, puppetfile, "/etc/puppet/Puppetfile"
     if File.exists?( puppetfile_lock )
       scp_to host, puppetfile_lock, "/etc/puppet/Puppetfile.lock"
     end
   else
-    raise "Cannot find Puppetfile or Puppetfile.erb!"
+    raise "Cannot find Puppetfile!"
   end
 
 end
