@@ -27,7 +27,6 @@ task :update_from_skeleton, :safe_update do |t,args|
 
   templates = [
     '.fixtures.yml.erb',
-    'Puppetfile.erb.erb',
     'metadata.json.erb',
     'spec/classes/example_spec.rb.erb',
     'spec/spec_helper_acceptance.rb.erb',
