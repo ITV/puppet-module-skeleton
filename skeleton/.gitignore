@@ -6,3 +6,5 @@ spec/fixtures/modules
 .vagrant
 .bundle
 vendor
+tags
+logs/
