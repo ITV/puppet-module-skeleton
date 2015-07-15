@@ -149,9 +149,8 @@ def upload_puppetfile(host)
 
   require 'yaml'
 
-  puppetfile = File.expand_path(File.join(project_root, 'Puppetfile'))
-  puppetfile_lock = File.expand_path(File.join(project_root, 'Puppetfile.lock'))
-  fixtures_file = File.expand_path(File.join( project_root, '.fixtures.yml' ))
+  puppetfile = File.expand_path(File.join(project_root, 'tests', 'Puppetfile'))
+  puppetfile_lock = File.expand_path(File.join(project_root, 'tests', 'Puppetfile.lock'))
 
   if File.exists?( puppetfile )
     scp_to host, puppetfile, "/etc/puppet/Puppetfile"
