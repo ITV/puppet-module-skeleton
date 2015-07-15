@@ -108,7 +108,7 @@ task :update_dependencies do |t,args|
 
   templates = {
     'tasks/templates/fixtures.yml.erb' => '.fixtures.yml',
-    'tasks/templates/puppetfile.erb' => 'tests/Puppetfile',
+    'tasks/templates/puppetfile.erb' => 'Puppetfile',
   }
 
   metadata_file = File.join(Dir.getwd, "itv.yaml")
