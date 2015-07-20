@@ -23,6 +23,8 @@ RSpec.configure do |c|
     if ENV['RSPEC_PUPPET_DEBUG']
       Puppet::Util::Log.level = :debug
       Puppet::Util::Log.newdestination(:console)
+      Puppet.settings[:graph] = true
+      Puppet.settings[:graphdir] = "#{project_root}"
     end
 
   end
