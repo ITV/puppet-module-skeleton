@@ -102,6 +102,8 @@ end
 desc 'Update module dependencies'
 task :update_dependencies do |t,args|
 
+  puts "\nUpdating module dependencies from itv.yaml ..."
+
   require 'erb'
   require 'yaml'
   require 'tempfile'
@@ -133,6 +135,8 @@ task :update_dependencies do |t,args|
     tmp_target.rewind
     FileUtils.cp tmp_target, target
   end
+
+  puts "\n ... update complete! \n\n"
 
 end
 
