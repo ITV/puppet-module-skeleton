@@ -186,6 +186,14 @@ def set_hieradata( hieradata_hash, calling_module='<%= metadata.name %>' )
 
 end
 
+def clear_hieradata( calling_module='<%= metadata.name %>' )
+
+  hosts.each do |host|
+    on host, "rm -fv /etc/puppet/hieradata/#{calling_module}.yaml"
+  end
+
+end
+
 def project_root
   proj_root = File.expand_path(File.join(File.dirname(__FILE__), '..'))
 end

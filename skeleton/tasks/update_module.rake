@@ -29,7 +29,7 @@ task :update_from_skeleton, :safe_update do |t,args|
   ]
 
   templates = [
-    '.fixtures.yml.erb',
+    'itv.yaml.erb',
     'metadata.json.erb',
     'spec/classes/example_spec.rb.erb',
     'spec/spec_helper_acceptance.rb.erb',
@@ -38,7 +38,6 @@ task :update_from_skeleton, :safe_update do |t,args|
 
   if safe_update
     protected_files = [
-      '.fixtures.yml.erb',
       'metadata.json.erb',
       'spec/classes/example_spec.rb.erb',
       'README.markdown.erb',
@@ -81,10 +80,12 @@ task :update_from_skeleton, :safe_update do |t,args|
 
   static_files.each do |f|
     skeleton_file =  File.join( skeleton_dir, f)
+    FileUtils.mkdir_p ( File.dirname(f) )
     FileUtils.cp skeleton_file, File.join(Dir.getwd, f) if File.exists?(skeleton_file)
   end
 
   templates.each do |t|
+    next unless File.exists? (File.join( skeleton_dir, t))
     template = ERB.new( File.read(File.join( skeleton_dir, t)), 0, '<>' )
     tmp_target = Tempfile.new(File.basename(t))
     tmp_target.write template.result(binding)
@@ -98,6 +99,8 @@ end
 
 ### This task manages the Puppetfile and .fixtures.yaml, to provide a consist mechanism
 ### for listing and updating dependencies for modules
+
+task :spec => [:update_dependencies]
 
 desc 'Update module dependencies'
 task :update_dependencies do |t,args|
