@@ -23,6 +23,8 @@ RSpec.configure do |c|
     if ENV['RSPEC_PUPPET_DEBUG']
       Puppet::Util::Log.level = :debug
       Puppet::Util::Log.newdestination(:console)
+      Puppet.settings[:graph] = true
+      Puppet.settings[:graphdir] = "#{project_root}"
     end
 
   end
@@ -49,6 +51,7 @@ shared_context "facter" do
     :concat_basedir => '/dne',
     :operatingsystem => 'CentOS',
     :architecture => 'x86_64',
+    :path => '/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin',
     :cache_bust => Time.now,
   }}
 end
