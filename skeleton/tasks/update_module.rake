@@ -131,8 +131,14 @@ task :update_dependencies do |t,args|
 
   all_repo_modules = profile_modules.merge( repo_modules )
 
-  repo_testing_modules  = metadata['dependencies']['puppet_modules']['testing_modules']['repo_modules'] || {}
-  forge_testing_modules = metadata['dependencies']['puppet_modules']['testing_modules']['forge_modules'] || {}
+
+  unless metadata['dependencies']['puppet_modules']['testing_modules'].nil?
+    repo_testing_modules  = metadata['dependencies']['puppet_modules']['testing_modules']['repo_modules'] || {}
+    forge_testing_modules = metadata['dependencies']['puppet_modules']['testing_modules']['forge_modules'] || {}
+  else
+    repo_testing_modules  = {}
+    forge_testing_modules = {}
+  end
 
   fixture_repo_modules  = all_repo_modules.merge( repo_testing_modules )
   fixture_forge_modules = forge_modules.merge( forge_testing_modules )
