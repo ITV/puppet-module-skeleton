@@ -9,3 +9,5 @@ vendor
 tags
 log/
 junit/
+Puppetfile
+.fixtures.yml
