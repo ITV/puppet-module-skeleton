@@ -2,6 +2,8 @@
 pkg
 spec/fixtures/manifests
 spec/fixtures/modules
+spec/fixtures/.librarian
+spec/fixtures/.tmp
 .rspec_system
 .vagrant
 .bundle
@@ -9,5 +11,4 @@ vendor
 tags
 log/
 junit/
-Puppetfile
 .fixtures.yml
