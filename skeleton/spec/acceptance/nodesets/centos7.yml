@@ -15,6 +15,7 @@ node_defaults: &defaults
 
 HOSTS:
   centos7:
+    <<: *defaults
     roles:
       - default
     facter:
