@@ -24,7 +24,8 @@ task :update_from_skeleton, :safe_update do |t,args|
     'spec/acceptance/nodesets/vagrant-centos6.yml',
     'spec/acceptance/nodesets/vagrant-centos7.yml',
     'tasks/templates/fixtures.yml.erb',
-    'tasks/templates/puppetfile.erb',
+    'tasks/templates/test-puppetfile.erb',
+    'tasks/templates/deps-puppetfile.erb',
     'tasks/update_module.rake',
   ]
 
