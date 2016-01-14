@@ -164,12 +164,20 @@ task :update_dependencies do |t,args|
 
   Dir.chdir( fixture_path ) do
     Bundler.with_clean_env do
-      if File.exists?(File.join( fixture_path, 'Puppetfile.lock' ))
-        FileUtils.rm_f (File.join( fixture_path, 'Puppetfile.lock' ))
+      if ENV['LIBRARIAN_clean'] == 'true'
+        sh "bundle exec librarian-puppet clean --verbose" do |ok,res|
+          unless ok
+            raise "something went wrong during the Librarian clean operation! see output for details"
+          end
+        end
       end
+      if File.exists?(File.join( fixture_path, 'Puppetfile.lock' ))
+        puts "Found lockfile, and update is not overriden"
+        FileUtils.rm_f (File.join( fixture_path, 'Puppetfile.lock' ))
+      end unless ENV['LIBRARIAN_lock'] == 'true'
       sh "bundle exec librarian-puppet install --verbose" do |ok,res|
         unless ok
-          raise "something went wrong during the bundle install! see output for details"
+          raise "something went wrong during the Librarian install! see output for details"
         end
       end
     end
