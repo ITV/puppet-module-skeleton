@@ -1,15 +1,27 @@
+---
+
+docker_image_commands: &docker_image_commands
+  - 'mkdir -p /root/.ssh'
+  - 'yum install -y tar gcc ruby-devel git cronie initscripts'
+  - 'gem install librarian-puppet'
+
+node_defaults: &defaults
+  platform: el-7-x86_64
+  hypervisor: docker
+  image: centos:7
+  docker_cmd: '["/sbin/init"]'
+  docker_preserve_image: true
+  docker_image_commands: *docker_image_commands
+
 HOSTS:
   centos7:
     roles:
-      - master
-    platform: el-7-x86_64
-    image: itv-centos7
-    hypervisor: docker
-    docker_cmd: '["/sbin/init"]'
-    docker_image_commands:
-      - 'mkdir -p /root/.ssh'
+      - default
+    facter:
+      role: default
 
 CONFIG:
   type: foss
   log_level: verbose
   forward_ssh_agent: true
+  color_host_output: true
