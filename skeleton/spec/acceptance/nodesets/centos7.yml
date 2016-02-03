@@ -14,12 +14,18 @@ node_defaults: &defaults
   docker_image_commands: *docker_image_commands
 
 HOSTS:
-  centos7:
+  default:
     <<: *defaults
     roles:
       - default
     facter:
       role: default
+#  second:
+#    <<: *defaults
+#    roles:
+#      - second
+#    facter:
+#      role: second
 
 CONFIG:
   type: foss
