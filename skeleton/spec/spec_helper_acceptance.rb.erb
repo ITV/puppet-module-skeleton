@@ -25,8 +25,11 @@ RSpec.configure do |c|
       upload_hiera_config(host, host['hiera_config_file'])
 
       ## Upload hiera data directory
-      hiera_data_dir = host['hieradata_dir'] || "hiera"
-      scp_to host, "#{project_root}/#{hiera_data_dir}", "/etc/puppet" if File.exists?("#{project_root}/#{hiera_data_dir}")
+      hiera_data_dir = host['hieradata_dir'] || "hieradata"
+
+      if File.exists?("#{project_root}/spec/fixtures/#{hiera_data_dir}")
+        scp_to host, "#{project_root}/spec/fixtures/#{hiera_data_dir}", "/etc/puppet"
+      end
 <% end %>
 
       ## Ensure authentication agent present (forces beaker run to fail if not available)
@@ -46,10 +49,10 @@ RSpec.configure do |c|
         lp_version = "-v 1.0.4"
       end
 
-<% if metadata.name =~ /(-puppet)$/ %>
+<% if metadata.name =~ /profile/ or metadata.name =~ /(-puppet)$/ %>
       ## Set facts defined in nodeset
       set_facts(host, host['facter'])
-<% else %>
+
       # Install module and dependencies from project root
       puppet_module_install(:source => project_root, :module_name => '<%= metadata.name %>')
 <% end %>

@@ -132,7 +132,7 @@ task :update_dependencies do |t,args|
     metadata = YAML.load( f )
   end
 
-  profile_modules = metadata['dependencies']['puppet_modules']['profile_modules']
+  profile_modules = metadata['dependencies']['puppet_modules']['profile_modules'] || nil
   repo_modules    = metadata['dependencies']['puppet_modules']['repo_modules']
   forge_modules   = metadata['dependencies']['puppet_modules']['forge_modules']
   local_modules   = metadata['dependencies']['puppet_modules']['local_modules']
