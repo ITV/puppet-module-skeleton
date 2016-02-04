@@ -52,10 +52,10 @@ RSpec.configure do |c|
 <% if metadata.name =~ /profile/ or metadata.name =~ /(-puppet)$/ %>
       ## Set facts defined in nodeset
       set_facts(host, host['facter'])
+<% end %>
 
       # Install module and dependencies from project root
       puppet_module_install(:source => project_root, :module_name => '<%= metadata.name %>')
-<% end %>
 
       ## Run any bootstrap commands we may have configured in nodeset YAML:
       host['bootstrap_commands'].each do |provision|
