@@ -11,6 +11,7 @@ group :test do
   gem "puppetlabs_spec_helper"
   gem "metadata-json-lint"
   gem "rspec-puppet-facts"
+  gem "deep_merge"
   gem "librarian-puppet"
   gem "hiera-puppet-helper", :git => 'https://github.com/bobtfish/hiera-puppet-helper.git'
 end
