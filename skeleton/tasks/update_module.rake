@@ -133,8 +133,8 @@ task :update_dependencies do |t,args|
   end
 
   profile_modules = metadata['dependencies']['puppet_modules']['profile_modules'] || nil
-  repo_modules    = metadata['dependencies']['puppet_modules']['repo_modules']
-  forge_modules   = metadata['dependencies']['puppet_modules']['forge_modules']
+  repo_modules    = metadata['dependencies']['puppet_modules']['repo_modules'] || {}
+  forge_modules   = metadata['dependencies']['puppet_modules']['forge_modules'] || {}
   local_modules   = metadata['dependencies']['puppet_modules']['local_modules']
 
   all_repo_modules = profile_modules.nil? ? repo_modules : profile_modules.merge( repo_modules )
