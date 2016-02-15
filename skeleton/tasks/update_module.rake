@@ -26,6 +26,7 @@ task :update_from_skeleton, :safe_update do |t,args|
     'tasks/templates/fixtures.yml.erb',
     'tasks/templates/test-puppetfile.erb',
     'tasks/templates/deps-puppetfile.erb',
+    'tasks/templates/metadata.json.erb',
     'tasks/update_module.rake',
   ]
 
@@ -104,14 +105,15 @@ end
 task :spec => [:update_dependencies]
 task :acceptance => [:update_dependencies]
 task :beaker => [:update_dependencies]
+task :update_deps => [:update_module, :update_dependencies]
 
-desc 'Update module dependencies'
-task :update_dependencies do |t,args|
+desc 'Update module config from itv.yaml'
+task :update_module do |t,args|
 
   project_root = File.expand_path(File.join(File.dirname(__FILE__), '..'))
   fixture_path = File.expand_path(File.join(project_root, 'spec', 'fixtures'))
 
-  puts "\nUpdating module dependencies from itv.yaml ..."
+  puts "\nUpdating module config from itv.yaml ..."
 
   require 'erb'
   require 'yaml'
@@ -122,6 +124,7 @@ task :update_dependencies do |t,args|
     'tasks/templates/fixtures.yml.erb' => '.fixtures.yml',
     'tasks/templates/deps-puppetfile.erb' => 'Puppetfile',
     'tasks/templates/test-puppetfile.erb' => "#{fixture_path}/Puppetfile",
+    'tasks/templates/metadata.json.erb' => 'metadata.json',
   }
 
   metadata_file = File.join(Dir.getwd, "itv.yaml")
@@ -159,6 +162,14 @@ task :update_dependencies do |t,args|
   end
 
   puts "\n ... update complete! \n"
+
+end
+
+desc 'Update module dependencies'
+task :update_dependencies do |t,args|
+
+  project_root = File.expand_path(File.join(File.dirname(__FILE__), '..'))
+  fixture_path = File.expand_path(File.join(project_root, 'spec', 'fixtures'))
 
   puts "\n ... running librarian-puppet \n\n"
 
