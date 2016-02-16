@@ -14,7 +14,7 @@ RSpec.configure do |c|
 
     hosts.each do |host|
 
-      install_puppet(:version => ENV['PUPPET_VERSION'] || '3.6.0')
+      install_puppet(:version => ENV['PUPPET_VERSION'] || '3.7.0')
 
       upload_ssh_config(host)
       upload_fixture_files(host)
@@ -25,8 +25,11 @@ RSpec.configure do |c|
       upload_hiera_config(host, host['hiera_config_file'])
 
       ## Upload hiera data directory
-      hiera_data_dir = host['hieradata_dir'] || "hiera"
-      scp_to host, "#{project_root}/#{hiera_data_dir}", "/etc/puppet" if File.exists?("#{project_root}/#{hiera_data_dir}")
+      hiera_data_dir = host['hieradata_dir'] || "hieradata"
+
+      if File.exists?("#{project_root}/spec/fixtures/#{hiera_data_dir}")
+        scp_to host, "#{project_root}/spec/fixtures/#{hiera_data_dir}", "/etc/puppet"
+      end
 <% end %>
 
       ## Ensure authentication agent present (forces beaker run to fail if not available)
@@ -36,6 +39,9 @@ RSpec.configure do |c|
       ## Install build dependencies:
       on host, "yum install -y tar gcc ruby-devel git"
 
+      ## Push modules directory to target host
+      upload_moduledir(host)
+
       ## Discover our ruby version, so we can pin librarian puppet, if required:
       rubyversion = on( host, facter('rubyversion')).stdout.strip
       if rubyversion == '1.8.7'
@@ -43,23 +49,13 @@ RSpec.configure do |c|
         lp_version = "-v 1.0.4"
       end
 
-      ## Push Puppetfile{,.lock} to target host
-      upload_puppetfile(host)
-
-      ## We manage module installation using librarian-puppet
-      on host, "gem list | grep librarian-puppet || gem install librarian-puppet #{lp_version}"
-      on host, "cd /etc/puppet && rm -vf Puppetfile.lock && librarian-puppet clean --verbose" if ENV['BEAKER_LP_clean']
-      on host, "cd /etc/puppet && librarian-puppet install --verbose"
-
-<% if metadata.name =~ /(-puppet)$/ %>
+<% if metadata.name =~ /profile/ or metadata.name =~ /(-puppet)$/ %>
       ## Set facts defined in nodeset
       set_facts(host, host['facter'])
-      ## Upload our local modules
-      scp_to host, "#{project_root}/localmodules", "/etc/puppet"
-<% else %>
+<% end %>
+
       # Install module and dependencies from project root
       puppet_module_install(:source => project_root, :module_name => '<%= metadata.name %>')
-<% end %>
 
       ## Run any bootstrap commands we may have configured in nodeset YAML:
       host['bootstrap_commands'].each do |provision|
@@ -91,6 +87,7 @@ def upload_hiera_config(host, hiera_config_file='hiera.yaml')
     :hierarchy => [
       "%{fqdn}/%{calling_module}",
       "%{calling_module}",
+      "%{role}",
       "common"
     ],
     :yaml => {
@@ -138,6 +135,8 @@ def upload_hiera_yaml( hiera_content, calling_module='<%= metadata.name %>' )
       file_to_upload = File.expand_path(File.join(File.dirname(__FILE__), '..', "spec/fixtures/hieradata/#{hiera_content}.yaml"))
       if File.exists?( file_to_upload )
         scp_to host, file_to_upload, "/etc/puppet/hieradata/#{calling_module}.yaml"
+      else
+        raise "Could not find #{file_to_upload}"
       end
     end
   end
@@ -146,8 +145,6 @@ end
 
 
 def upload_puppetfile(host)
-
-  require 'yaml'
 
   puppetfile = File.expand_path(File.join(project_root, 'Puppetfile'))
   puppetfile_lock = File.expand_path(File.join(project_root, 'Puppetfile.lock'))
@@ -159,6 +156,19 @@ def upload_puppetfile(host)
     end
   else
     raise "Cannot find Puppetfile!"
+  end
+
+end
+
+def upload_moduledir(host)
+
+  moduledir = File.expand_path(File.join(project_root, 'spec/fixtures/modules'))
+
+  if File.exists?( moduledir )
+    on host, "rm -Rf /etc/puppet/modules"
+    scp_to host, moduledir, "/etc/puppet"
+  else
+    raise "Cannot find moduledir!"
   end
 
 end

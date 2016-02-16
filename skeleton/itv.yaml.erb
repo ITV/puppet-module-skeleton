@@ -3,6 +3,7 @@
 project: puppet
 repo: <%= metadata.name %>
 git_url: '<%= metadata.source %>'
+description: '<%= defined?(metadata.description) ? metadata.description : metadata.summary %>'
 version: '<%= metadata.version %>'
 
 dependencies:

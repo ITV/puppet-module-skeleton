@@ -1,0 +1,31 @@
+#!/usr/bin/env ruby
+#^syntax detection
+
+### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
+### WARNING - This file should be automatically generated using ### ###
+### WARNING     the rake tasks in the root of the checkout      ### ###
+### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
+
+forge "https://forgeapi.puppetlabs.com"
+
+<% unless fixture_forge_modules.nil? or fixture_forge_modules.empty? -%>
+<% fixture_forge_modules.each_pair do |mod,name| -%>
+<% if name.respond_to?(:to_hash) -%>
+mod '<%= name['repo'] %>', '<%= name['ref'] %>'
+<% else -%>
+mod '<%= name %>'
+<% end -%>
+<% end -%>
+<% end -%>
+
+<% unless fixture_repo_modules.nil? or fixture_repo_modules.empty? -%>
+<% fixture_repo_modules.each_pair do |mod,repo| -%>
+mod '<%= mod %>',
+<% if repo.respond_to?(:to_hash) -%>
+    :git => '<%= repo['repo'] %>',
+    :ref => '<%= repo['ref'] %>'
+<% else -%>
+    :git => '<%= repo %>'
+<% end -%>
+<% end -%>
+<% end -%>

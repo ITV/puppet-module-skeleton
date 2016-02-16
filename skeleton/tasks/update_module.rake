@@ -24,7 +24,9 @@ task :update_from_skeleton, :safe_update do |t,args|
     'spec/acceptance/nodesets/vagrant-centos6.yml',
     'spec/acceptance/nodesets/vagrant-centos7.yml',
     'tasks/templates/fixtures.yml.erb',
-    'tasks/templates/puppetfile.erb',
+    'tasks/templates/test-puppetfile.erb',
+    'tasks/templates/deps-puppetfile.erb',
+    'tasks/templates/metadata.json.erb',
     'tasks/update_module.rake',
   ]
 
@@ -100,20 +102,29 @@ end
 ### This task manages the Puppetfile and .fixtures.yaml, to provide a consist mechanism
 ### for listing and updating dependencies for modules
 
-task :spec => [:update_dependencies]
+task :spec => [:update_module, :update_dependencies]
+task :acceptance => [:update_module, :update_dependencies]
+task :beaker => [:update_module, :update_dependencies]
+task :update_deps => [:update_module, :update_dependencies]
 
-desc 'Update module dependencies'
-task :update_dependencies do |t,args|
+desc 'Update module config from itv.yaml'
+task :update_module do |t,args|
 
-  puts "\nUpdating module dependencies from itv.yaml ..."
+  project_root = File.expand_path(File.join(File.dirname(__FILE__), '..'))
+  fixture_path = File.expand_path(File.join(project_root, 'spec', 'fixtures'))
+
+  puts "\nUpdating module config from itv.yaml ..."
 
   require 'erb'
   require 'yaml'
   require 'tempfile'
+  require 'bundler'
 
   templates = {
     'tasks/templates/fixtures.yml.erb' => '.fixtures.yml',
-    'tasks/templates/puppetfile.erb' => 'Puppetfile',
+    'tasks/templates/deps-puppetfile.erb' => 'Puppetfile',
+    'tasks/templates/test-puppetfile.erb' => "#{fixture_path}/Puppetfile",
+    'tasks/templates/metadata.json.erb' => 'metadata.json',
   }
 
   metadata_file = File.join(Dir.getwd, "itv.yaml")
@@ -124,13 +135,12 @@ task :update_dependencies do |t,args|
     metadata = YAML.load( f )
   end
 
-  profile_modules = metadata['dependencies']['puppet_modules']['profile_modules']
-  repo_modules    = metadata['dependencies']['puppet_modules']['repo_modules']
-  forge_modules   = metadata['dependencies']['puppet_modules']['forge_modules']
+  profile_modules = metadata['dependencies']['puppet_modules']['profile_modules'] || nil
+  repo_modules    = metadata['dependencies']['puppet_modules']['repo_modules'] || {}
+  forge_modules   = metadata['dependencies']['puppet_modules']['forge_modules'] || {}
   local_modules   = metadata['dependencies']['puppet_modules']['local_modules']
 
-  all_repo_modules = profile_modules.merge( repo_modules )
-
+  all_repo_modules = profile_modules.nil? ? repo_modules : profile_modules.merge( repo_modules )
 
   unless metadata['dependencies']['puppet_modules']['testing_modules'].nil?
     repo_testing_modules  = metadata['dependencies']['puppet_modules']['testing_modules']['repo_modules'] || {}
@@ -151,7 +161,37 @@ task :update_dependencies do |t,args|
     FileUtils.cp tmp_target, target
   end
 
-  puts "\n ... update complete! \n\n"
+  puts "\n ... update complete! \n"
 
 end
 
+desc 'Update module dependencies'
+task :update_dependencies do |t,args|
+
+  project_root = File.expand_path(File.join(File.dirname(__FILE__), '..'))
+  fixture_path = File.expand_path(File.join(project_root, 'spec', 'fixtures'))
+
+  puts "\n ... running librarian-puppet \n\n"
+
+  Dir.chdir( fixture_path ) do
+    Bundler.with_clean_env do
+      if ENV['LIBRARIAN_clean'] == 'true'
+        sh "bundle exec librarian-puppet clean --verbose" do |ok,res|
+          unless ok
+            raise "something went wrong during the Librarian clean operation! see output for details"
+          end
+        end
+      end
+      if File.exists?(File.join( fixture_path, 'Puppetfile.lock' ))
+        puts "Found lockfile, and update is not overriden"
+        FileUtils.rm_f (File.join( fixture_path, 'Puppetfile.lock' ))
+      end unless ENV['LIBRARIAN_lock'] == 'true'
+      sh "bundle exec librarian-puppet install --verbose" do |ok,res|
+        unless ok
+          raise "something went wrong during the Librarian install! see output for details"
+        end
+      end
+    end
+  end
+
+end
