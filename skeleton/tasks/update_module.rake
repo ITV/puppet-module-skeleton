@@ -102,9 +102,9 @@ end
 ### This task manages the Puppetfile and .fixtures.yaml, to provide a consist mechanism
 ### for listing and updating dependencies for modules
 
-task :spec => [:update_dependencies]
-task :acceptance => [:update_dependencies]
-task :beaker => [:update_dependencies]
+task :spec => [:update_module, :update_dependencies]
+task :acceptance => [:update_module, :update_dependencies]
+task :beaker => [:update_module, :update_dependencies]
 task :update_deps => [:update_module, :update_dependencies]
 
 desc 'Update module config from itv.yaml'
