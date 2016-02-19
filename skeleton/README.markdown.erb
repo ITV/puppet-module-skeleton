@@ -38,3 +38,66 @@ Alternately, change to the directory of the Beaker generated Vagrantfile:
 $ cd .vagrant/beaker_vagrant_files/$BEAKER_SET
 ```
 and run `vagrant ssh` - if there are multiple boxes, you may need to use `vagrant ssh [box_name]`
+
+#### Docker provider
+
+The Beaker acceptance tests can also be run using the Docker provider. On OSX, you can use docker-machine
+to achieve this. Install the [docker-toolbox](https://www.docker.com/products/docker-toolbox) which includes
+docker-machine, create a machine (beyond the scope of this doc), and set the docker environment using:
+```
+eval "$(docker-machine env vboxdock)
+```
+
+Once that's done, you should be able to run Beaker with the following command:
+```shell
+$ BEAKER_set=centos7 bundle exec rake acceptance
+```
+
+Making sure that the `BEAKER_set` you select references the docker provider.
+On linux, you should be able to use docker natively, install it via your distributions packaging system.
+
+#### librarian-puppet
+
+The testing process uses librarian-puppet to install and manage dependencies, instead of using both the
+puppetlabs-spec-helper and librarian-puppet. Modules for testing are installed into `spec/fixtures/modules`,
+and an additional Puppetfile (and lockfile) is created in the `spec/fixtures` directory. Both of these, and
+the Puppetfile in the root of the repo, should be committed to version control.
+
+In order to speed up the testing process, you can set an environment variable to use the current/existing
+librarian-puppet lock file; this then runs an `install` operation for librarian, instead of an `update`,
+using the existing `Puppetfile.lock` lockfile:
+```
+export LIBRARIAN_lock=true
+```
+
+## Rake tasks
+
+In addition to the standard testing rake tasks defined above, we have a number of tasks to manage
+dependencies for a module, as well as updating from the module skeleton:
+
+
+```shell
+$ bundle exec rake update_module
+```
+
+- This is used to update specific files in the project: `metadata.json`, `Puppetfile`, and the testing `Puppetfile`.
+  It will read from the `itv.yaml` file found in the root of the repo, and use that to populate these files,
+  using a set of templates. This task is set to always run prior to the standard testing operations.
+
+
+```shell
+$ bundle exec rake update_dependencies
+```
+
+- This initiates a `librarian-puppet` operation, which will update the existing dependencies for the module, based on
+  values defined in the `itv.yaml` - and then populate the relevant files with dependencies, so they can be committed
+  to the repo. This task is set to always run prior to the standard testing operations.
+
+
+```shell
+$ bundle exec rake update_from_skeleton
+```
+
+- This task will update the entire module from the currently installed [puppet-module-skeleton](https://github.com/ITV/puppet-module-skeleton)
+  It will update a list of files with their new versions from the module skeleton, performing a safe update operation.
+  This should be run periodically during testing, and can also be run from CI to do a bulk update.
