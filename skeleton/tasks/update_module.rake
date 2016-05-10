@@ -70,15 +70,14 @@ task :update_from_skeleton, :safe_update do |t,args|
   end
 
   metadata.name         = repo_name =~ /^(puppet-module)/ ? repo_name.split(/puppet-module-/)[1] : repo_name
-  metadata.author       = 'itv'
-  metadata.license      = 'Apache 2.0'
+  metadata.author       = metadata_hash['author']
   metadata.version      = metadata_hash['version']
   metadata.source       = metadata_hash['source']
-  metadata.author       = metadata_hash['author']
   metadata.summary      = metadata_hash['summary']
   metadata.issues_url   = metadata_hash['issues_url']
   metadata.description  = metadata_hash['description']
   metadata.project_page = metadata_hash['project_page']
+  metadata.license      = 'Apache 2.0'
 
   static_files.each do |f|
     skeleton_file =  File.join( skeleton_dir, f)
