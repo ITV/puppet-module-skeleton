@@ -54,6 +54,5 @@ shared_context "facter" do
     :operatingsystem => 'CentOS',
     :architecture => 'x86_64',
     :path => '/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin',
-    :cache_bust => Time.now,
   }}
 end
