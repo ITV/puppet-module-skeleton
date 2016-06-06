@@ -29,3 +29,9 @@ mod '<%= mod %>',
 <% end -%>
 <% end -%>
 <% end -%>
+
+<% unless local_modules.nil? or local_modules.empty? -%>
+<% local_modules.each_pair do |mod,repo| -%>
+exclusion 'itv-<%= mod %>'
+<% end -%>
+<% end -%>
