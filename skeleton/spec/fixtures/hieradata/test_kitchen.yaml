@@ -1,0 +1,10 @@
+---
+
+profile_sensu::sensu_plugins: {}
+profile_sensu::manage_services: false
+profile_sensu::install_omnibus: false
+
+profile_base::sudoconf:
+  kitchen:
+    priority: 20
+    content: 'kitchen ALL = NOPASSWD: ALL'

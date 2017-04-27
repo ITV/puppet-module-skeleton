@@ -1,0 +1,42 @@
+---
+
+driver:
+  name: docker
+  privileged: true
+  run_command: /sbin/init
+
+provisioner:
+  name: puppet_apply
+  # Not installing chef since inspec is used for testing
+  require_chef_for_busser: false
+  puppet_detailed_exitcodes: true
+  puppet_whitelist_exit_code: 0
+  puppet_show_diff: true
+  manifests_path: spec/fixtures/manifests
+  hiera_config_path: spec/fixtures/hiera-kitchen.yaml
+  hiera_data_path: spec/fixtures/hieradata
+  puppetfile_path: spec/fixtures/Puppetfile
+<%% if ENV['PUPPET_VERSION'] && ENV['PUPPET_VERSION'].to_i >= 4 %>
+  require_puppet_collections: true
+<%% else %>
+  puppet_future_parser: true
+<%% end %>
+  puppet_verbose: true
+  retry_on_exit_code: [ 1, 2 ]
+  wait_for_retry: 3
+  custom_facts:
+    product: eyetv
+    location: local
+    role: <%= @configs[:puppet_module].gsub('puppet-','').gsub('-','_') %>
+    env: dev
+
+verifier:
+  name: inspec
+
+platforms:
+  - name: centos-7.2
+
+suites:
+  - name: default
+    provisioner:
+      manifest: site.pp
