@@ -1,6 +1,5 @@
 .*.sw?
 pkg
-spec/fixtures/manifests
 spec/fixtures/modules
 spec/fixtures/.librarian
 spec/fixtures/.tmp
@@ -11,4 +10,6 @@ vendor
 tags
 log/
 junit/
+.idea
 .fixtures.yml
+.kitchen/

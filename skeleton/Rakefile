@@ -4,11 +4,20 @@ require 'puppet/vendor/semantic/lib/semantic' unless Puppet.version.to_f < 3.6
 require 'puppet-lint/tasks/puppet-lint'
 require 'puppet-syntax/tasks/puppet-syntax'
 
+PuppetSyntax.future_parser = true
+
 # These gems aren't always present, for instance
 # on Travis with --without development
 begin
   require 'puppet_blacksmith/rake_tasks'
 rescue LoadError
+end
+
+begin
+  require 'kitchen/rake_tasks'
+  Kitchen::RakeTasks.new
+rescue LoadError
+  puts '>>>>> Kitchen gem not loaded, omitting tasks' unless ENV['CI']
 end
 
 Rake::Task[:lint].clear
@@ -30,6 +39,7 @@ PuppetLint.configuration.send('disable_selector_inside_resource')
 PuppetLint.configuration.send('disable_documentation')
 PuppetLint.configuration.send('disable_nested_classes_or_defines')
 PuppetLint.configuration.send('disable_autoloader_layout')
+PuppetLint.configuration.send('disable_140chars')
 
 # https://github.com/relud/puppet-lint-strict_indent-check#alternate-indentation
 PuppetLint.configuration.chars_per_indent = ENV['PUPPET_LINT_CHARS_PER_INDENT'] || 2
@@ -61,12 +71,19 @@ task :metadata do
   sh "metadata-json-lint metadata.json"
 end
 
+task :clean_librarian do
+  librarian_config = File.join( File.dirname(__FILE__), 'spec/fixtures/.librarian/puppet/config')
+  FileUtils.rm librarian_config if File.exists?( librarian_config )
+end
+
 desc "Run syntax, lint, and spec tests."
 task :test => [
+  :clean_librarian,
   :syntax,
   :lint,
   :spec,
-  :metadata,
+  'kitchen:all',
+  :metadata_lint,
 ]
 
 ### Import all tasks from the tasks dir:
