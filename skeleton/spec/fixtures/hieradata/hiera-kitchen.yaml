@@ -1,0 +1,10 @@
+---
+:backends:
+  - yaml
+
+:yaml:
+  :datadir: /tmp/kitchen/hiera
+
+:hierarchy:
+  - test_kitchen
+  - common
