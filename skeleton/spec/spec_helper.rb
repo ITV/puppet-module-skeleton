@@ -1,5 +1,4 @@
 require 'puppetlabs_spec_helper/module_spec_helper'
-require 'hiera-puppet-helper'
 require 'yaml'
 
 def fixture_path
@@ -18,6 +17,10 @@ RSpec.configure do |c|
   # Enable colour in Jenkins
   c.color = true
   c.tty = true
+  c.strict_variables = true
+  c.parser = 'future'
+  c.template_dir = File.expand_path(File.join(__FILE__, '../fixtures/templates'))
+  c.hiera_config = File.expand_path(File.join(__FILE__, '../fixtures/hiera.yaml'))
   c.before do
     # avoid "Only root can execute commands as other users"
     Puppet.features.stubs(:root? => true)
@@ -32,28 +35,36 @@ RSpec.configure do |c|
   end
 end
 
-# use both rpsec and yaml backends .. see: https://github.com/bobtfish/hiera-puppet-helper#advanced
-shared_context "hieradata" do
-  let(:hiera_config) do
-    { :backends => ['rspec', 'yaml'],
-    :hierarchy => [
-      '%{fqdn}/%{calling_module}',
-      '%{calling_module}',
-      'common'],
-    :yaml => {
-      :datadir => File.join(fixture_path, 'hieradata') },
-    :rspec => respond_to?(:hiera_data) ? hiera_data : {} }
-  end
-end
-
 shared_context "facter" do
   let(:default_facts) {{
-    :kernel => 'Linux',
-    :osfamily => 'RedHat',
-    :concat_basedir => '/dne',
-    :operatingsystem => 'CentOS',
     :architecture => 'x86_64',
+    :awsregion => 'eu-west-1',
+    :concat_basedir => '/dne',
+    :ecosystem => 'dev',
+    :ec2_ami_id => 'ami-12345678',
+    :ec2_instance_type => 't2.medium',
+    :ec2_placement_availability_zone => 'eu-west-1a',
+    :env => 'test',
+    :ipaddress => '10.10.10.10',
+    :ipaddress_eth0 => '10.0.0.2',
+    :ipaddress_eth1 => '10.0.0.3',
+    :ipaddress_lo => '127.0.0.1',
+    :is_virtual => true,
+    :kernel => 'Linux',
+    :kernelrelease => '1.2.3',
+    :kernelversion => '3.10.0',
+    :location => 'local',
+    :operatingsystem => 'CentOS',
+    :operatingsystemmajrelease => '7.2',
+    :operatingsystemrelease => '7.0',
+    :osfamily => 'RedHat',
     :path => '/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin',
-    :cache_bust => Time.now,
+    :product => 'product',
+    :puppetversion => '4.8.1',
+    :selinux => false,
+    :sensu_plugins_omnibus => '1.3.0',
+    :staging_http_get => 'curl',
+    :sudoversion => '1.8.6p7',
+    :virtual => 'xenhvm',
   }}
 end
