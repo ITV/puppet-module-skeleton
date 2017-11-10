@@ -1,21 +1,9 @@
 require 'spec_helper'
 
-os = ENV['BEAKER_set'] ||= 'centos6'
-
-case os
-when /default/
-  osversion = '6'
-when /centos6/
-  osversion = '6'
-when /centos7/
-  osversion = '7'
-else
-  raise "Operating system: #{os} is not supported"
-end
+osversion = '7'
 
 describe '<%= metadata.name %>' do
 
-  include_context "hieradata"
   include_context "facter"
 
   context 'supported operating systems' do
