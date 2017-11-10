@@ -1,0 +1,2 @@
+name: <%= @configs[:puppet_module].gsub('puppet-','').gsub('-','_') %>
+version: 0.1.0
