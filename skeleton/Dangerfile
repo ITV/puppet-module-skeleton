@@ -1,0 +1,79 @@
+require 'yaml'
+require 'json'
+
+# Make it more obvious that a PR is a work in progress and shouldn't be merged yet
+warn("PR is classed as Work in Progress") if github.pr_title.include? "[WIP]"
+
+# Warn when there is a big PR
+warn("Big PR") if git.lines_of_code > 500
+
+# Changelog description should be in .release file
+no_release_entry = !git.modified_files.include?("*.release")
+no_changelog_entry = !git.modified_files.include?("CHANGELOG.md")
+no_itv_yaml_change = !git.modified_files.include?("itv.yaml")
+no_metadata_json_change = !git.modified_files.include?("metadata.json")
+
+if no_release_entry
+  message("INFO: There appears to be no .release file - consider adding one next time?")
+end
+
+# We either need to include a .release file, or have made changes to CHANGELOG.md, itv.yaml and metadata.json
+if no_release_entry && no_changelog_entry
+  warn("Pull request requires EITHER a description placed in a release file (see [Jenkins Release](https://github.com/ITV/cp-docs/wiki/howto:Puppet-Development#jenkins-release)) OR an update to the CHANGELOG.md")
+end
+if no_release_entry && no_itv_yaml_change
+  warn("Pull request requires EITHER a description placed in a release file (see [Jenkins Release](https://github.com/ITV/cp-docs/wiki/howto:Puppet-Development#jenkins-release)) OR an update to the itv.yaml")
+end
+if no_release_entry && no_metadata_json_change
+  warn("Pull request requires EITHER a description placed in a release file (see [Jenkins Release](https://github.com/ITV/cp-docs/wiki/howto:Puppet-Development#jenkins-release)) OR an update to the metadata.json")
+end
+# We don't want to have both a .release file AND changes to CHANGELOG.md and metadata.json
+if !no_release_entry && !no_changelog_entry
+  warn("Pull request requires EITHER a description placed in a release file (see [Jenkins Release](https://github.com/ITV/cp-docs/wiki/howto:Puppet-Development#jenkins-release)) OR an update to the CHANGELOG.md, NOT BOTH")
+end
+if !no_release_entry && !no_metadata_json_change
+  warn("Pull request requires EITHER a description placed in a release file (see [Jenkins Release](https://github.com/ITV/cp-docs/wiki/howto:Puppet-Development#jenkins-release)) OR an update to the metadata.json, NOT BOTH")
+end
+
+# --------------------------------------------------------------------------------------------------------------------
+# Have any changes happened inside the actual code (and tests)?
+# --------------------------------------------------------------------------------------------------------------------
+has_spec_changes = !git.modified_files.grep(/spec/).empty?
+has_module_changes = !git.modified_files.grep(/(manifests|files|templates)/).empty?
+
+# --------------------------------------------------------------------------------------------------------------------
+# You've made changes to manifest files, but didn't write any tests?
+# --------------------------------------------------------------------------------------------------------------------
+if has_module_changes && !has_spec_changes
+  warn("There are manifest changes, but no tests adjusted. That's OK as long as you're refactoring existing code.", sticky: false)
+end
+
+begin
+  itv_yaml = File.read "itv.yaml"
+  itv_data = YAML.load itv_yaml
+  itv_vers = itv_data['version']
+
+rescue SyntaxError => e
+  # YAML could not be parsed, fail the build.
+  fail("itv.yaml isn't valid YAML")
+end
+
+begin
+  metadata_json = File.read "metadata.json"
+  metadata_data = JSON.parse metadata_json
+  metadata_vers = metadata_data['version']
+
+rescue SyntaxError => e
+  # JSON could not be parsed, fail the build.
+  fail("metadata.json isn't valid JSON")
+end
+
+if itv_vers != metadata_vers
+  fail("Versions defined in metadata.json and itv.yaml don't match!")
+end
+
+# Mainly to encourage writing up some reasoning about the PR, rather than
+# just leaving a title
+if github.pr_body.length < 3
+  fail "Please provide a summary in the Pull Request description"
+end
